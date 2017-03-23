@@ -88,8 +88,8 @@ int main() {
 	printf("\n");*/
 
 //MULTIṔLICACION DE MATRICES
-	//m_filas(n,m,o,c,a,b);
-	m_columnas(n,m,o,c,a,b);
+	m_filas(n,m,o,c,a,b);
+	//m_columnas(n,m,o,c,a,b);
 
     return 0;
 }
