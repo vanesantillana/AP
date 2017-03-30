@@ -2,30 +2,29 @@
 #include <string.h> 
 #include <mpi.h> 
 
-const int MAX STRING = 100;
+const int  MAX_STRING = 100;
 
-int main(void) 
-{
-	char greeting[MAX STRING];
-	int comm sz; 
-	int my rank; 
+int main(void) {
+	char greeting[MAX_STRING];
+	int comm_sz; 
+	int my_rank; 
 
-	MPI Init(NULL, NULL);
-	MPI Comm size(MPI COMM WORLD, &comm sz);
-	MPI Comm rank(MPI COMM WORLD, &my rank);
+	MPI_Init(NULL, NULL);
+	MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
+	MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
- 	if (my rank != 0) {
- 		sprintf(greeting, "Greetings from process %d of %d!",my rank, comm sz);
- 		MPI Send(greeting, strlen(greeting)+1, MPI CHAR, 0, 0, MPI COMM WORLD);
+ 	if (my_rank != 0) {
+ 		sprintf(greeting, "Greetings from process %d of %d!",my_rank, comm_sz);
+ 		MPI_Send(greeting, strlen(greeting)+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
  	} 
  	else {
- 		printf("Greetings from process %d of %d!\n", my rank,comm sz);
- 		for (int q = 1; q < comm sz; q++) {
- 			MPI Recv(greeting, MAX STRING, MPI CHAR, q,0, MPI COMM WORLD, MPI STATUS IGNORE);
+ 		printf("Greetings from process %d of %d!\n", my_rank,comm_sz);
+ 		for (int q = 1; q < comm_sz; q++) {
+ 			MPI_Recv(greeting, MAX_STRING, MPI_CHAR, q,0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
  		printf("%s\n", greeting);
  		}
  	}
 
- MPI Finalize();
+ MPI_Finalize();
  return 0;
 } 
