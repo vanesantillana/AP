@@ -2,7 +2,7 @@
 #include <string.h>
 #include <mpi.h>
 
-const int MAX_STRING = 100;
+const int MAX_STRING = 1;
 
 int main(void)
 {
