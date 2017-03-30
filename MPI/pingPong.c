@@ -2,33 +2,29 @@
 #include <string.h>
 #include <mpi.h>
 
-const int MAX_STRING = 1;
+const int MAX_STRING = 100;
 
 int main(void)
 {
-    char num[MAX_STRING];
-    int num_proceso;
-    int id_proceso;
-	
-    MPI_Init(NULL,NULL);
-    MPI_Comm_size(MPI_COMM_WORLD , &num_proceso);
-    MPI_Comm_rank(MPI_COMM_WORLD , &id_proceso );
+    MPI_Init(NULL, NULL);
+    int id_procesos; 
+    int num_procesos; 
+    MPI_Comm_rank(MPI_COMM_WORLD, &id_procesos);
+    MPI_Comm_size(MPI_COMM_WORLD, &num_procesos);
 
-    if(id_proceso != 0)
-    {
-        sprintf(num," Salgo desde el proceso %d al %d!",id_proceso,num_proceso);
-        MPI_Send(num,strlen(num)+1, MPI_CHAR , 0, 0, MPI_COMM_WORLD);        
-    }
-    else
-    {
-        printf("Salgo dede el proceso %d al %d!\n",id_proceso,num_proceso);
-        for(int i=1; i< num_proceso;i++)
-        {
-            MPI_Recv(num,MAX_STRING,MPI_CHAR,i,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-            printf("%s\n",num);
+    const int limit = 10;
+    int cont = 0;
+    int emisor = (id_procesos + 1) % 2;
+    while (cont < limit) {
+        if (id_procesos == cont % 2) { 
+          cont++;
+          MPI_Send(&cont, 1, MPI_INT, emisor, 0, MPI_COMM_WORLD);
+          printf("%d Envio  :%d   con contador:%d \n", id_procesos, emisor, cont);
+        } else {
+          MPI_Recv(&cont, 1, MPI_INT, emisor, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          printf("%d Recibo :%d   con contador:%d \n", id_procesos, emisor, cont);
         }
     }
-    
     MPI_Finalize();
     return 0;
 
