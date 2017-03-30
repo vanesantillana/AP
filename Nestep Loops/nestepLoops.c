@@ -66,7 +66,7 @@ void m_MatrixBlocked(int n, int m, int o, int BlockSize,int a[n][o], int b[n][m]
     fin = clock();
     tiempoTotal = ((double) (fin - inicio)) * 1000 / CLOCKS_PER_SEC;
     printf("%f\n", tiempoTotal);
-    //print(n,o,a);
+    print(n,o,a);
 }
 
 void m_llenar(int n,int m,int mat[n][m])

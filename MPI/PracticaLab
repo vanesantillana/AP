@@ -1,0 +1,23 @@
+3.9
+1. ¿Qué sucede en el programa de saludos si, en lugar de strlen (saludo) + 1, usamos strlen (saludo) para la longitud del mensaje enviado por los procesos 1, 2, .., comm_sz-1? ¿Qué sucede si usamos MAX STRING en lugar de strlen (saludo) + 1? ¿Puede explicar estos resultados?
+
+Si usamos en vez de strlen(saludo)+1 el strlen(saludo), no se esta enviando el mensaje completo.
+Si se usa MAX_STRING estariamos mandando de la forma en que se recibe, por lo tanto el saludo cambia de tamaño al enviarce con el maximo tamaño que puede darce en el programa saludo seria.
+
+2. Modifique la regla trapezoidal para que estime correctamente la integral incluso si comm_sz no divide equitativamente n. (Todavía puede asumir que n ≥ comm_sz).
+
+Recordemos que podemos usar la regla trapezoidal para aproximar el área entre el gráfico de una función y una manera de hacer esto es calcular el cociente entero de h donde h es  y el resto de n sobre Todos los procesos obtendrán n sobre comm_sz trapezoides. Mientras que el primer n mod_comm_sz obtendrá un extra trapezoidal
+
+int quotient =n/comm_sz;
+int remainder=n% comm_sz;
+if (my_rank <remainder){
+	local_n=quotient +1;
+	local_a=a +my_rank*local_n + h;
+	local_b=local_a + local_n*h;
+}
+else{
+	local_n=quotient;
+	local_a=a +my_rank*local_n*h + remainder*h;
+	local_b=local_a + local_n*h;
+}
+
