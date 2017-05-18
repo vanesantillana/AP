@@ -4,121 +4,13 @@
 
 int thread_count;
 
-void Usage(char prog_name[]);
-
-void Get_args(
-      char*    argv[]        /* in  */,
-      int*     bin_count_p   /* out */,
-      float*   min_meas_p    /* out */,
-      float*   max_meas_p    /* out */,
-      int*     data_count_p  /* out */,
-      int*     thread_count);
-
-void Gen_data(
-      float   min_meas    /* in  */, 
-      float   max_meas    /* in  */, 
-      float   data[]      /* out */,
-      int     data_count  /* in  */);
-
-void Gen_bins(
-      float min_meas      /* in  */, 
-      float max_meas      /* in  */, 
-      float bin_maxes[]   /* out */, 
-      int   bin_counts[]  /* out */, 
-      int   bin_count     /* in  */);
-
-int Which_bin(
-      float    data         /* in */, 
-      float    bin_maxes[]  /* in */, 
-      int      bin_count    /* in */, 
-      float    min_meas     /* in */);
-
-void Print_histo(
-      float    bin_maxes[]   /* in */, 
-      int      bin_counts[]  /* in */, 
-      int      bin_count     /* in */, 
-      float    min_meas      /* in */);
-
-int main(int argc, char* argv[]) {
-   int bin_count, i, bin;
-   float min_meas, max_meas;
-   float* bin_maxes;
-   int* bin_counts;
-   int data_count;
-   float* data;
-
-   /* Check and get command line args */
-   if (argc != 6) Usage(argv[0]);
-   Get_args(argv, &bin_count, &min_meas, &max_meas, &data_count, &thread_count);
-
-   /* Allocate arrays needed */
-   bin_maxes = malloc(bin_count*sizeof(float));
-   bin_counts = malloc(bin_count*sizeof(int));
-   data = malloc(data_count*sizeof(float));
-
-   /* Generate the data */
-   Gen_data(min_meas, max_meas, data, data_count);
-
-   /* Create bins for storing counts */
-   Gen_bins(min_meas, max_meas, bin_maxes, bin_counts, bin_count);
-
-   /* Count number of values in each bin */
-   #pragma omp parallel for num_threads(thread_count) default(none) \
-      shared(data_count, data, bin_maxes, bin_count, min_meas, bin_counts) \
-      private(bin, i)
-   for (i = 0; i < data_count; i++) {
-      bin = Which_bin(data[i], bin_maxes, bin_count, min_meas);
-      #pragma omp critical
-      bin_counts[bin]++;
-   }
-
-#  ifdef DEBUG
-   printf("bin_counts = ");
-   for (i = 0; i < bin_count; i++)
-      printf("%d ", bin_counts[i]);
-   printf("\n");
-#  endif
-
-   /* Print the histogram */
-   Print_histo(bin_maxes, bin_counts, bin_count, min_meas);
-
-   free(data);
-   free(bin_maxes);
-   free(bin_counts);
-   return 0;
-
-}  /* main */
-
-
-/*---------------------------------------------------------------------
- * Function:  Usage 
- * Purpose:   Print a message showing how to run program and quit
- * In arg:    prog_name:  the name of the program from the command line
- */
-void Usage(char prog_name[] /* in */) {
-   fprintf(stderr, "usage: %s ", prog_name); 
-   fprintf(stderr, "<bin_count> <min_meas> <max_meas> <data_count> <thread_count>\n");
+void parametros(char prog_name[]) {
+   fprintf(stderr, "parametros: %s <bin_count> <min_meas> <max_meas> <data_count> <thread_count>\n",prog_name);
    exit(0);
-}  /* Usage */
+}  
 
 
-/*---------------------------------------------------------------------
- * Function:  Get_args
- * Purpose:   Get the command line arguments
- * In arg:    argv:  strings from command line
- * Out args:  bin_count_p:   number of bins
- *            min_meas_p:    minimum measurement
- *            max_meas_p:    maximum measurement
- *            data_count_p:  number of measurements
- */
-void Get_args(
-      char*    argv[]        /* in  */,
-      int*     bin_count_p   /* out */,
-      float*   min_meas_p    /* out */,
-      float*   max_meas_p    /* out */,
-      int*     data_count_p  /* out */,
-      int*     thread_count) {
-
+void get_args(char* argv[], int* bin_count_p, float* min_meas_p, float* max_meas_p, int* data_count_p, int* thread_count) {
    *bin_count_p = strtol(argv[1], NULL, 10);
    *min_meas_p = strtof(argv[2], NULL);
    *max_meas_p = strtof(argv[3], NULL);
@@ -130,22 +22,9 @@ void Get_args(
    printf("min_meas = %f, max_meas = %f\n", *min_meas_p, *max_meas_p);
    printf("data_count = %d\n", *data_count_p);
 #  endif
-}  /* Get_args */
+}  
 
-
-/*---------------------------------------------------------------------
- * Function:  Gen_data
- * Purpose:   Generate random floats in the range min_meas <= x < max_meas
- * In args:   min_meas:    the minimum possible value for the data
- *            max_meas:    the maximum possible value for the data
- *            data_count:  the number of measurements
- * Out arg:   data:        the actual measurements
- */
-void Gen_data(
-        float   min_meas    /* in  */, 
-        float   max_meas    /* in  */, 
-        float   data[]      /* out */,
-        int     data_count  /* in  */) {
+void generarData(float min_meas, float max_meas, float data[], int data_count) {
    int i;
 
    srandom(0);
@@ -161,25 +40,9 @@ void Gen_data(
       printf("%4.3f ", data[i]);
    printf("\n");
 #  endif
-}  /* Gen_data */
+}  
 
-
-/*---------------------------------------------------------------------
- * Function:  Gen_bins
- * Purpose:   Compute max value for each bin, and store 0 as the
- *            number of values in each bin
- * In args:   min_meas:   the minimum possible measurement
- *            max_meas:   the maximum possible measurement
- *            bin_count:  the number of bins
- * Out args:  bin_maxes:  the maximum possible value for each bin
- *            bin_counts: the number of data values in each bin
- */
-void Gen_bins(
-      float min_meas      /* in  */, 
-      float max_meas      /* in  */, 
-      float bin_maxes[]   /* out */, 
-      int   bin_counts[]  /* out */, 
-      int   bin_count     /* in  */) {
+void generarBins(float min_meas, float max_meas, float bin_maxes[], int bin_counts[], int bin_count) {
    float bin_width;
    int   i;
 
@@ -200,31 +63,9 @@ void Gen_bins(
       printf("%4.3f ", bin_maxes[i]);
    printf("\n");
 #  endif
-}  /* Gen_bins */
+}  
 
-
-/*---------------------------------------------------------------------
- * Function:  Which_bin
- * Purpose:   Use binary search to determine which bin a measurement 
- *            belongs to
- * In args:   data:       the current measurement
- *            bin_maxes:  list of max bin values
- *            bin_count:  number of bins
- *            min_meas:   the minimum possible measurement
- * Return:    the number of the bin to which data belongs
- * Notes:      
- * 1.  The bin to which data belongs satisfies
- *
- *            bin_maxes[i-1] <= data < bin_maxes[i] 
- *
- *     where, bin_maxes[-1] = min_meas
- * 2.  If the search fails, the function prints a message and exits
- */
-int Which_bin(
-      float   data          /* in */, 
-      float   bin_maxes[]   /* in */, 
-      int     bin_count     /* in */, 
-      float   min_meas      /* in */) {
+int llenarBin(float   data, float  bin_maxes[], int bin_count, float  min_meas) {
    int bottom = 0, top =  bin_count-1;
    int mid;
    float bin_max, bin_min;
@@ -240,28 +81,11 @@ int Which_bin(
       else
          return mid;
    }
-
-   /* Whoops! */
-   fprintf(stderr, "Data = %f doesn't belong to a bin!\n", data);
-   fprintf(stderr, "Quitting\n");
    exit(-1);
-}  /* Which_bin */
+} 
 
-
-/*---------------------------------------------------------------------
- * Function:  Print_histo
- * Purpose:   Print a histogram.  The number of elements in each
- *            bin is shown by an array of X's.
- * In args:   bin_maxes:   the max value for each bin
- *            bin_counts:  the number of elements in each bin
- *            bin_count:   the number of bins
- *            min_meas:    the minimum possible measurment
- */
-void Print_histo(
-        float  bin_maxes[]   /* in */, 
-        int    bin_counts[]  /* in */, 
-        int    bin_count     /* in */, 
-        float  min_meas      /* in */) {
+void imprimir(float  bin_maxes[], int bin_counts[], int bin_count, float  min_meas) 
+{
    int i, j;
    float bin_max, bin_min;
 
@@ -270,7 +94,50 @@ void Print_histo(
       bin_min = (i == 0) ? min_meas: bin_maxes[i-1];
       printf("%.3f-%.3f:\t", bin_min, bin_max);
       for (j = 0; j < bin_counts[i]; j++)
-         printf("X");
+         printf("≡");
       printf("\n");
    }
-}  /* Print_histo */
+} 
+
+
+int main(int argc, char* argv[]) {
+   int bin_count, i, bin;
+   float min_meas, max_meas;
+   float* bin_maxes;
+   int* bin_counts;
+   float* data;
+   int data_count;
+
+   /* Check parametros*/
+   if (argc != 6) parametros(argv[0]);
+   get_args(argv, &bin_count, &min_meas, &max_meas, &data_count, &thread_count);
+
+   bin_maxes = malloc(bin_count*sizeof(float)); // array de los float
+   bin_counts = malloc(bin_count*sizeof(int));  // array de los int 
+   data = malloc(data_count*sizeof(float));
+
+   /* DATOS */
+   generarData(min_meas, max_meas, data, data_count);
+
+   /* CONTENEDORES*/
+   generarBins(min_meas, max_meas, bin_maxes, bin_counts, bin_count);
+
+   /* Cuenta los datos para cada bin */
+   #pragma omp parallel for num_threads(thread_count) default(none) \
+      shared(data_count, data, bin_maxes, bin_count, min_meas, bin_counts) \
+      private(bin, i)
+   for (i = 0; i < data_count; i++) {
+      bin = llenarBin(data[i], bin_maxes, bin_count, min_meas);
+      #pragma omp critical
+      bin_counts[bin]++;
+   }
+
+   imprimir(bin_maxes, bin_counts, bin_count, min_meas);
+
+   free(data);
+   free(bin_maxes);
+   free(bin_counts);
+   return 0;
+
+} 
+
