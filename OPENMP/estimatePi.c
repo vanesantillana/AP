@@ -2,17 +2,18 @@
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
+#include <time.h>
 
 void parametros(char* prog_name) {
    fprintf(stderr, "parametros: %s thread_count number_tosses\n", prog_name); 
    exit(0);
 }
 
-double random() {
-   double random_value;
+double randomValor() {
+   double randomValor_value;
    srand ( time ( NULL));
-   random_value = (double)rand()/RAND_MAX*2.0-1.0;
-   return random_value;
+   randomValor_value = (double)rand()/RAND_MAX*2.0-1.0;
+   return randomValor_value;
 }
 
 int main(int argc, char* argv[]) {
@@ -27,10 +28,11 @@ int main(int argc, char* argv[]) {
 
    number_in_circle =0;
    
-#  pragma omp parallel for num_threads(thread_count)\reduction(+: number_in_circle) private(x, y, distancia)
+#  pragma omp parallel for num_threads(thread_count)\
+   reduction(+: number_in_circle) private(x, y, distancia)
    for (int i = 0; i < number_tosses; i++) {
-      x = random();
-      y = random();
+      x = randomValor();
+      y = randomValor();
       distancia = x*x + y*y;
 
       if (distancia <= 1) {

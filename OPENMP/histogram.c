@@ -62,6 +62,7 @@ int llenarBin(float   data, float  bin_maxes[], int bin_count, float  min_meas) 
       else
          return mid;
    }
+   exit(-1);
 } 
 
 void imprimir(float  bin_maxes[], int bin_counts[], int bin_count, float  min_meas) 
