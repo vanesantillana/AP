@@ -3,36 +3,34 @@
 #include <math.h>
 #include <omp.h>
 
-void Usage(char* prog_name) {
-   fprintf(stderr, "usage: %s <thread_count> <number_tosses>\n", prog_name);  /* Change */
+void parametros(char* prog_name) {
+   fprintf(stderr, "parametros: %s thread_count number_tosses\n", prog_name); 
    exit(0);
 }
 
-double num_aleatorio() {
-   double numero = (double) random() / (double) RAND_MAX;
-   if((double) random() / (double) RAND_MAX < 0.5) {
-      numero *= -1;
-   }
-   return numero;
+double random() {
+   double random_value;
+   srand ( time ( NULL));
+   random_value = (double)rand()/RAND_MAX*2.0-1.0;
+   return random_value;
 }
 
 int main(int argc, char* argv[]) {
-   long int number_tosses, number_in_circle;
-   int thread_count, i;
+   int number_tosses, number_in_circle;
+   int thread_count;
    double x, y, distancia;
 
-   if (argc != 3) Usage(argv[0]);
+   if (argc != 3) parametros(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    number_tosses = strtoll(argv[2], NULL, 10);
-   if (thread_count < 1 || number_tosses < 1) Usage(argv[0]);
+   if (thread_count < 1 || number_tosses < 1) parametros(argv[0]);
 
    number_in_circle =0;
-   srandom(0);
-#  pragma omp parallel for num_threads(thread_count) \
-      reduction(+: number_in_circle) private(x, y, distancia)
-   for (i = 0; i < number_tosses; i++) {
-      x = num_aleatorio(); // Gera nnumero entre -1 e 1
-      y = num_aleatorio();
+   
+#  pragma omp parallel for num_threads(thread_count)\reduction(+: number_in_circle) private(x, y, distancia)
+   for (int i = 0; i < number_tosses; i++) {
+      x = random();
+      y = random();
       distancia = x*x + y*y;
 
       if (distancia <= 1) {
@@ -40,7 +38,7 @@ int main(int argc, char* argv[]) {
       }
    }
    double pi = 4*number_in_circle/((double) number_tosses);
-   printf("Estimacao de pi = %.14f\n", pi);
+   printf("pi = %.14f\n", pi);
    return 0;
-}  /* main */
+}  
 
