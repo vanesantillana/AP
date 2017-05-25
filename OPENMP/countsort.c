@@ -2,17 +2,12 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <string.h>
-#define MAXIMO 100
 
-int num_aleatorio() {
-   int numero = random() % MAXIMO;
-   return numero;
-}
 
 void geraMatriz(int * a, int n) {
    int i;
    for (i = 0; i < n; ++i) {
-      a[i] = num_aleatorio();
+      a[i] = random() % 100;
    }
 }
 
@@ -21,7 +16,7 @@ void imprimeMatriz(int * a, int n) {
    for (i = 0; i < n; ++i) {
       printf("%d ", a[i]);
    }
-   printf("\n");
+   printf("\n");*
 }
 
 int main(int argc, char* argv[]) {
