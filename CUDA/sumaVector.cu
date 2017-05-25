@@ -48,7 +48,7 @@ int main(){
   datosRandom(h_A,n);
   datosRandom(h_B,n);
   vecAdd(h_A,h_B,h_C,n);
-  printVector(h_A,n);
+  printVector(h_C,n);
   
   return 0;
 }

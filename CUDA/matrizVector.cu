@@ -43,11 +43,11 @@ void matrixVector(float* A, float* B, float* C, int tam)
 
 
 void datosRandom(float *array,int n){
-  for(int i = 0; i < n; i++){
-    //scanf("%f", &array[i]);
-    for(int j = 0; j < n; j++)
-    	array[i*n+j] = 1;
-  }
+	//srand(time(NULL));
+	for(int i = 0; i < n; i++){
+	    for(int j = 0; j < n; j++)
+	    	array[i*n+j] = 1;
+	}
 }
 
 void printMatrix(float *array,int n){
