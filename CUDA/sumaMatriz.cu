@@ -25,7 +25,7 @@ void sumaMatrixKernelRow(float* A, float* B, float* C, int n)
 }
 
 __global__
-void sumaMatrizKernelColumn(float* A, float* B, float* C, int n)
+void sumaMatrixKernelColumn(float* A, float* B, float* C, int n)
 {
 	int i = threadIdx.x + (blockDim.x * blockIdx.x);
 	if(i<n)
@@ -49,27 +49,29 @@ void sumaMatrix(float* A, float* B, float* C, int tam)
 	cudaMemcpy(d_A,A,size,cudaMemcpyHostToDevice);
 	cudaMemcpy(d_B,B,size,cudaMemcpyHostToDevice);
 
-	sumaMatrizKernel<<<ceil(tam*tam/256.0),256>>>(d_A,d_B,d_C,tam);
-	//sumaMatrizKernelRow<<<ceil(tam/256.0),256>>>(d_A,d_B,d_C,tam);
-	//sumaMatrizKernelColumn<<<ceil(tam/256.0),256>>>(d_A,d_B,d_C,tam);
+	sumaMatrixKernel<<<ceil(tam*tam/256.0),256>>>(d_A,d_B,d_C,tam);
+	//sumaMatrixKernelRow<<<ceil(tam/256.0),256>>>(d_A,d_B,d_C,tam);
+	//sumaMatrixKernelColumn<<<ceil(tam/256.0),256>>>(d_A,d_B,d_C,tam);
 
 	cudaMemcpy(C,d_C,size,cudaMemcpyDeviceToHost);
 
 	cudaFree(d_A);cudaFree(d_B);cudaFree(d_C);
 	
 }
-void datosRandom(float *array){
-	for(int i = 0; i < n; i++)
-	{
-	   for(int j = 0; j < n; j++)
-	     array[i*n+j] = rand() % 100;
-    }
+
+void datosRandom(float *array,int n){
+  for(int i = 0; i < n; i++){
+    //scanf("%f", &array[i]);
+    for(int j = 0; j < n; j++)
+    	array[i*n+j] = 1;
+  }
 }
-void printMatrix(float *array){
-	for(int i = 0; i < n; i++){
-    	cout<<h_A[i]<<" ";
-    }
-    cout<<endl;
+
+void printMatrix(float *array,int n){
+  for(int i = 0; i < n; i++){
+    printf("%f ", array[i]);
+  }
+  printf("\n");
 }
 
 int main()
@@ -80,10 +82,10 @@ int main()
 	h_B = new float[n*n];
 	h_C = new float[n*n];
 
-	datosRandom(h_A);
-	datosRandom(h_B);
+	datosRandom(h_A,n);
+	datosRandom(h_B,n);
     sumaMatrix(h_A,h_B,h_C,n);
-    printMatrix(h_C);
+    printMatrix(h_C,n);
 
    	return 0;	
 }

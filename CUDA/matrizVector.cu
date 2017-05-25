@@ -40,32 +40,34 @@ void matrixVector(float* A, float* B, float* C, int tam)
 	
 }
 
-void datosRandom(float *array){
-	for(int i = 0; i < n; i++)
-	{
-	   for(int j = 0; j < n; j++)
-	     array[i*n+j] = rand() % 100;
-    }
-}
-void printMatrix(float *array){
-	for(int i = 0; i < n; i++){
-    	cout<<h_A[i]<<" ";
-    }
-    cout<<endl;
+
+
+void datosRandom(float *array,int n){
+  for(int i = 0; i < n; i++){
+    //scanf("%f", &array[i]);
+    for(int j = 0; j < n; j++)
+    	array[i*n+j] = 1;
+  }
 }
 
+void printMatrix(float *array,int n){
+  for(int i = 0; i < n; i++){
+    printf("%f ", array[i]);
+  }
+  printf("\n");
+}
 int main()
 {
-	int n = 3;
+	int n = 10;
 	float *h_A,*h_B,*h_C;
 	h_A = new float[n*n];
 	h_B = new float[n*n];
 	h_C = new float[n*n];
 
-	datosRandom(h_A);
-	datosRandom(h_B);
+	datosRandom(h_A,n);
+	datosRandom(h_B,n);
     matrixVector(h_A,h_B,h_C,n);
-    printMatrix(h_C);
+    printMatrix(h_C,n);
 
    	return 0;
 }

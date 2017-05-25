@@ -1,15 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>    
-#include <time.h>
-#include <iostream>
-
-using namespace std;
 
 __global__
 void vecAddKernel(float *A, float *B, float *C, int n){
   int i = threadIdx.x + blockDim.x * blockIdx.x;
-  if(i < n) 
-    C[i] = A[i] + B[i];
+  if(i < n) C[i] = A[i] + B[i];
 }
 
 void vecAdd(float* A, float* B, float* C, int n){
@@ -29,33 +23,32 @@ void vecAdd(float* A, float* B, float* C, int n){
   cudaFree(d_A); cudaFree(d_B); cudaFree(d_C);
 }
 
-void datosRandom(float *array){
-  for(int i = 0; i < n; i++)
-  {
-     for(int j = 0; j < n; j++)
-       array[i*n+j] = rand() % 100;
-    }
+void datosRandom(float *array,int n){
+  for(int i = 0; i < n; i++){
+    //scanf("%f", &array[i]);
+    array[i] = 1;
+  }
 }
 
-void printMatrix(float *array){
+void printVector(float *array,int n){
   for(int i = 0; i < n; i++){
-      cout<<h_A[i]<<" ";
-    }
-    cout<<endl;
+    printf("%f ", array[i]);
+  }
+  printf("\n");
 }
 
 int main(){
-  int n,i;
+  int n;
   float *h_A,*h_B,*h_C;
   scanf("%d", &n);
   h_A = (float*) malloc(n*sizeof(float));
   h_B = (float*) malloc(n*sizeof(float));
   h_C = (float*) malloc(n*sizeof(float));
   
-  datosRandom(h_A);
-  datosRandom(h_B);
+  datosRandom(h_A,n);
+  datosRandom(h_B,n);
   vecAdd(h_A,h_B,h_C,n);
-  printMatrix(h_C);
-
+  printVector(h_A,n);
+  
   return 0;
 }
