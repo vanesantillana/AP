@@ -170,12 +170,44 @@ void UCTSearch(int s0[]){
 	}
 }
 
+/*3pmcts*/
+void 3PMCTS( tokenlimit ) {
+	tbb::parallel_pipeline( tokenlimit,
+	tbb::make_filter <void , Token∗>( tbb::filter::serial_in_order,[&]( tbb::flow_control & fc )−>Token ∗
+	{
+		Token * t =tokenpool[index];
+		index =(index+1)%tokenlimit;
+		if(t.v!=NULL){
+			fc.stop();
+			return NULL;
+		}
+		else{
+			t=Select(t);
+			return t;
+		}
+	}) &
+	tbb::make_filter <Token∗,Token∗>(tbb::filter::parallel,[&](Token ∗ t){
+		return Expand(t);
+	}) &
+	tbb::make_filter <Token∗,Token∗>(tbb::filter::parallel,[&](Token ∗ t){
+		return RandomSimulation(t);
+	}) &
+	tbb::make_filter <Token∗,Token∗>(tbb::filter::parallel,[&](Token ∗ t){
+		return Evaluation(t);
+	}) &
+	tbb::make_filter <Token∗,Token∗>(tbb::filter::parallel,[&](Token ∗ t){
+		return Backup(t);
+	})
+	};
+
+}
+
+
 int main()
 {
 	int a[5]={2,3,4,5,6};
 	Node minode(a);
 	Node * moves;
 	
-  	cout<<"hola"<<endl;
   	return 0;
 }
