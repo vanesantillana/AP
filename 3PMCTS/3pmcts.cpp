@@ -171,7 +171,7 @@ void UCTSearch(int s0[]){
 }
 
 /*3pmcts*/
-void 3PMCTS( tokenlimit ) {
+void 3PMCTS(Token tokenlimit ) {
 	tbb::parallel_pipeline( tokenlimit,
 	tbb::make_filter <void , Token∗>( tbb::filter::serial_in_order,[&]( tbb::flow_control & fc )−>Token ∗
 	{
@@ -197,8 +197,7 @@ void 3PMCTS( tokenlimit ) {
 	}) &
 	tbb::make_filter <Token∗,Token∗>(tbb::filter::parallel,[&](Token ∗ t){
 		return Backup(t);
-	})
-	};
+	});
 
 }
 
