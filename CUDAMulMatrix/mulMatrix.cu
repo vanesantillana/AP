@@ -74,7 +74,7 @@ void MatrixMult(float* A, float* B, float* C, int n){
 void datosRandom(float *array,int n){
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++)
-      array[i*n+j] = rand() % 100;
+      array[i*n+j] = rand() % 10;
   }
 }
 
